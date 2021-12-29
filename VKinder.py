@@ -8,7 +8,8 @@ from pprint import pprint
 from operator import itemgetter
 from registration import Registration
 import psycopg2
-from findperson import FindPerson
+from findperson import GetPhoto
+from database import Get_id
 
 with open('token_group.txt', 'r') as file_object:
     token_group = file_object.read().strip()
@@ -25,16 +26,16 @@ for event in longpoll.listen():
     if event.type == VkEventType.MESSAGE_NEW and event.to_me:
         id_client = event.user_id
         if event.to_me:
-            request = event.text.lower()
+            request = event.text
 
-            if request == "привет":
+            if request.lower() == "привет":
                 write_msg(event.user_id, f"Хай, {event.user_id}, чтобы найти пару напишите 'найти пару' ")
             elif request == "найти пару":
                 sex = Registration.get_sex(Registration, id_client) 
                 city = Registration.get_city(Registration, id_client)
                 age = Registration.get_age(Registration, id_client)
-                person_id = FindPerson.find_person(FindPerson,sex,city,age,event.user_id)
-                url_photo = FindPerson.get_photo(FindPerson,person_id)
+                person_id = Get_id.find_person(Get_id,sex,city,age,event.user_id)
+                url_photo = GetPhoto.get_photo(GetPhoto,person_id)
                 # write_msg(event.user_id, f'Ссылка https://vk.com/id{person_id}, Лучшие фото ({},{},{})'.format(url_photo[0],url_photo[1],url_photo[2]))
                 write_msg(event.user_id, f'Ссылка https://vk.com/id{person_id}')
                 for i in range(len(url_photo)):
